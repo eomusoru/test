@@ -404,6 +404,7 @@ function renderTemplate() {
   const gearCount = new Set(t.days.flatMap(d => d.flatMap(s => gearOf(t, s)))).size;
   const provs = new Set(t.days.flat().map(s => s.mode).filter(m => m && m !== 'solo').concat(rentals(t).map(r => r.provider)));
   return `<div class="scroll">
+    <p class="small" style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:var(--accent-soft)">A real 5-day trip, done by an athlete. Take it as yours, change any day, and the app sorts your gear, bookings and weather.</p>
     <p class="eyebrow">Tenerife · Canary Islands</p>
     <h1 style="margin-top:6px">${esc(TEMPLATE.title)}</h1>
     <div class="row" style="margin-top:12px"><div class="avatar">E</div><div class="small"><b>Done by ${esc(TEMPLATE.by)}</b><br><span class="tiny">${esc(TEMPLATE.doneOn)} · real routes, real providers</span></div></div>
