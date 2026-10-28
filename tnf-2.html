@@ -1,0 +1,689 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tenerife Trip Companion</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: phone frame on the left, prototype controls and live stored state on the right; stacks on phones. */
+:root {
+  --bg: #EEF2F1; --surface: #FFFFFF; --surface-2: #F1F5F4; --ink: #13201F; --ink-2: #4A5958; --ink-3: #7F8D8C;
+  --line: #DCE3E2; --accent: #0A8794; --accent-ink: #FFFFFF; --accent-soft: #DDF1F2;
+  --warn: #8F5400; --warn-soft: #FCEFD8; --ok: #2B7A4B; --ok-soft: #E2F2E7; --frame: #1A2423;
+  --bike: #0A8794; --run: #B9661A; --water: #2C68A8; --leisure: #6F7C7B; --task: #7F8D8C;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0D1312; --surface: #162020; --surface-2: #1D2828; --ink: #E7EEED; --ink-2: #A8B5B4; --ink-3: #6E7C7B;
+  --line: #2A3736; --accent: #3FC2CE; --accent-ink: #062325; --accent-soft: #123538;
+  --warn: #F0B65C; --warn-soft: #3A2A10; --ok: #6CCB90; --ok-soft: #12301F; --frame: #000000;
+  --bike: #3FC2CE; --run: #E89F55; --water: #78AEE6; --leisure: #93A09F; --task: #6E7C7B; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0D1312; --surface: #162020; --surface-2: #1D2828; --ink: #E7EEED; --ink-2: #A8B5B4; --ink-3: #6E7C7B;
+  --line: #2A3736; --accent: #3FC2CE; --accent-ink: #062325; --accent-soft: #123538;
+  --warn: #F0B65C; --warn-soft: #3A2A10; --ok: #6CCB90; --ok-soft: #12301F; --frame: #000000;
+  --bike: #3FC2CE; --run: #E89F55; --water: #78AEE6; --leisure: #93A09F; --task: #6E7C7B; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.page { display: flex; gap: 32px; justify-content: center; align-items: flex-start; flex-wrap: wrap;
+  padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.phone { width: 390px; max-width: 100%; height: 800px; background: var(--frame); border-radius: 44px; padding: 10px; flex: none; }
+.screen { position: relative; height: 100%; border-radius: 36px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
+.scroll { flex: 1; overflow-y: auto; padding: 22px 18px 24px; }
+.tabs { display: flex; border-top: 1px solid var(--line); background: var(--surface); padding: 8px 6px 14px; }
+.tabs button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--ink-3); padding: 4px 0; }
+.tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
+.tabs .count { font-size: 10px; background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 0 5px; margin-left: 2px; }
+
+h1, h2, h3 { font-family: var(--display); font-weight: 700; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: 26px; line-height: 1.15; }
+h2 { font-size: 19px; }
+h3 { font-size: 15px; font-weight: 500; }
+.eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; }
+.tiny { font-size: 12px; color: var(--ink-3); }
+.row { display: flex; align-items: center; gap: 10px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.warn { background: var(--warn-soft); color: var(--warn); }
+.chip.accent { background: var(--accent-soft); color: var(--accent); }
+button.chip { border: 1px dashed var(--line); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 12px; padding: 10px 14px; font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { border: 1px solid var(--line); background: var(--surface); }
+.btn.sm { padding: 6px 10px; font-size: 12px; border-radius: 10px; }
+
+.day { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.day-head { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; }
+.day-head .wx { margin-left: auto; font-size: 12px; color: var(--ink-3); white-space: nowrap; display: flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+.day.past .day-head { color: var(--ink-3); }
+.day.today { border: 1.5px solid var(--accent); border-radius: 18px; padding: 14px; margin: 6px 0; }
+.dot { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--surface-2); color: var(--ink-2); flex: none; font-variant-numeric: tabular-nums; }
+.day.today .dot { background: var(--accent); color: var(--accent-ink); }
+.day.past .dot { background: var(--ok-soft); color: var(--ok); }
+.summary { font-size: 12px; color: var(--ink-3); margin: 4px 0 0 36px; }
+
+.tl { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; }
+.tl li { display: grid; grid-template-columns: 44px 16px minmax(0, 1fr); gap: 6px; position: relative; padding-bottom: 12px; }
+.tl li:not(:last-child)::after { content: ""; position: absolute; left: 57px; top: 16px; bottom: 0; width: 1px; background: var(--line); }
+.tl .t { font-size: 12px; color: var(--ink-3); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.tl .m { width: 10px; height: 10px; border-radius: 50%; margin: 5px 0 0 3px; background: var(--task); position: relative; z-index: 1; }
+.tl .derived .m { background: var(--surface); border: 1.5px solid var(--task); }
+.tl .derived .what { color: var(--ink-2); font-size: 13px; }
+.what b { font-weight: 600; }
+.sport-road-bike { --c: var(--bike); } .sport-trail-run { --c: var(--run); } .sport-water { --c: var(--water); } .sport-leisure { --c: var(--leisure); }
+.tl .act .m { background: var(--c); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+.alert { background: var(--warn-soft); color: var(--warn); border-radius: 14px; padding: 12px; margin-top: 12px; }
+.alert p { margin: 4px 0 10px; font-size: 13px; }
+.alert .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.alert .btn { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.prep { background: var(--surface-2); border-radius: 14px; padding: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.prep.focus { background: var(--accent-soft); }
+.check { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 13px; padding: 4px 0; }
+.box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--ink-3); display: grid; place-items: center; flex: none; }
+.check[aria-pressed="true"] .box { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.check[aria-pressed="true"] .lbl { color: var(--ink-3); text-decoration: line-through; }
+.check .why { margin-left: auto; font-size: 11px; color: var(--ink-3); text-align: right; }
+
+.hero-card { background: var(--surface-2); border-radius: 20px; padding: 18px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-family: var(--display); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.stats div { background: var(--surface); border-radius: 12px; padding: 10px; }
+.stats b { display: block; font-family: var(--display); font-size: 20px; font-variant-numeric: tabular-nums; }
+.stats span { font-size: 11px; color: var(--ink-3); }
+.prev { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.prev li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 13px; }
+.sticky-cta { position: sticky; bottom: 0; background: var(--surface); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+label.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-3); }
+input[type="date"], select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+
+.list { list-style: none; margin: 0; padding: 0; }
+.list > li { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface-2); border-radius: 14px; padding: 12px; width: 100%; text-align: left; }
+.sw { width: 40px; height: 24px; border-radius: 12px; background: var(--line); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); transition: left .15s; }
+.toggle[aria-pressed="true"] .sw { background: var(--accent); }
+.toggle[aria-pressed="true"] .sw::after { left: 19px; }
+.map { width: 100%; height: auto; background: var(--surface-2); border-radius: 16px; display: block; }
+.map .land { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.map text { font-family: var(--body); font-size: 9px; fill: var(--ink-3); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.filters button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+.side { width: 360px; max-width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+.panel h2 { font-size: 17px; margin-bottom: 4px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.seg button { border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.ctl { margin-top: 14px; }
+pre.state { font-family: var(--mono); font-size: 11px; line-height: 1.45; background: var(--surface-2); border-radius: 12px; padding: 12px; overflow-x: auto; max-height: 300px; margin: 10px 0 0; color: var(--ink-2); }
+.derives { margin: 10px 0 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+
+.more { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--accent); margin-top: 6px; }
+.more svg.i { width: 14px; height: 14px; transition: transform .15s; }
+.more[aria-expanded="true"] svg.i { transform: rotate(180deg); }
+.detail { margin-top: 8px; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+.detail h4 { margin: 0 0 4px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.detail ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.detail li { display: flex; align-items: center; gap: 8px; }
+.cond-ok { color: var(--ok); } .cond-bad { color: var(--warn); font-weight: 600; }
+.prep-head { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 13px; }
+.prep-head .chev { margin-left: auto; display: inline-flex; transition: transform .15s; }
+.prep-head[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.bk { display: flex; align-items: center; gap: 8px; }
+.bk .chip { margin-left: auto; }
+.chip.solid { background: var(--accent); color: var(--accent-ink); }
+.sheet-wrap { position: absolute; inset: 0; background: rgba(8, 14, 13, 0.45); display: flex; align-items: flex-end; z-index: 20; }
+.sheet { background: var(--surface); width: 100%; border-radius: 22px 22px 0 0; padding: 18px 18px 22px; max-height: 88%; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.sheet .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: -6px auto 0; }
+.kv { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 6px 10px; font-size: 13px; }
+.kv dt { color: var(--ink-3); } .kv dd { margin: 0; }
+.stepper { display: flex; align-items: center; gap: 12px; }
+.stepper button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); font-size: 18px; }
+.stepper b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+textarea { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; min-height: 56px; }
+.status { background: var(--ok-soft); color: var(--ok); border-radius: 14px; padding: 12px; font-size: 13px; }
+.status b { display: block; font-size: 15px; }
+.cost { background: var(--surface-2); border-radius: 18px; padding: 14px; margin: 12px 0 6px; display: flex; flex-direction: column; gap: 10px; }
+.cost .big { font-family: var(--display); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--ok); border-radius: 4px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: var(--ink-3); }
+.split b { display: block; font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.price { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.demo-hint { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--ink-2); background: var(--surface-2); border: 1px dashed var(--ink-3); border-radius: 12px; padding: 8px 10px; margin-bottom: 12px; }
+.demo-hint .where::after { content: "on the right"; }
+.panel.demo { border: 1.5px dashed var(--ink-3); }
+.demo-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 6px; background: var(--ink); color: var(--surface); vertical-align: middle; margin-right: 6px; }
+.day-head .chev { display: inline-flex; color: var(--ink-3); transition: transform .15s; }
+.day-head[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+@media (max-width: 760px) {
+  .demo-hint .where::after { content: "below the app"; }
+  .sheet-wrap { position: fixed; }
+  .sheet { padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+  .page { padding-block: 12px 32px; }
+  .phone { width: 100%; height: auto; background: none; padding: 0; border-radius: 0; }
+  .screen { border-radius: 20px; border: 1px solid var(--line); overflow: visible; }
+  .scroll { overflow: visible; }
+  .tabs { position: sticky; bottom: 0; border-radius: 0 0 20px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { .sw::after, .more svg.i, .prep-head .chev, .day-head .chev { transition: none; } }
+</style>
+
+<div class="page">
+  <div class="phone"><div class="screen" id="screen" aria-live="polite"></div></div>
+  <aside class="side" id="side"></aside>
+</div>
+
+<script type="application/json" id="seed">{"catalog":{"destination":{"id":"tenerife","name":"Tenerife","base":"loscristianos"},"places":{"loscristianos":{"name":"Los Cristianos","lat":28.05,"lng":-16.716},"masca":{"name":"Masca","lat":28.306,"lng":-16.842},"santiago":{"name":"Santiago del Teide","lat":28.296,"lng":-16.815},"chio":{"name":"Chío","lat":28.25,"lng":-16.77},"parador":{"name":"Parador de Las Cañadas","lat":28.223,"lng":-16.623},"vilaflor":{"name":"Vilaflor","lat":28.157,"lng":-16.636},"losroques":{"name":"Los Roques de García","lat":28.221,"lng":-16.629},"summit":{"name":"Pico del Teide","lat":28.272,"lng":-16.642},"elmedano":{"name":"El Médano","lat":28.045,"lng":-16.537},"garachico":{"name":"Garachico","lat":28.373,"lng":-16.764},"puerto":{"name":"Puerto de la Cruz","lat":28.414,"lng":-16.549}},"providers":{"host":{"name":"Your local host","short":"host","offers":["Bike rental","Shuttles","SUP guiding"],"book":{"channel":"WhatsApp","confirms":"Your host confirms on WhatsApp, usually the same day."}},"supacademy":{"name":"Supacademy","short":"Supacademy","offers":["Open-water swim","Water bike","Kayak","Run support"],"book":{"channel":"online or WhatsApp","confirms":"Supacademy confirms the time and meeting point."}},"car":{"name":"Car rental","short":"car rental","offers":["Cars"],"book":{"channel":"online","confirms":"The rental company confirms by email."}},"park":{"name":"Parque Nacional del Teide","short":"national park","offers":["Summit permits"],"book":{"channel":"the park website","url":"https://www.reservasparquesnacionales.es","confirms":"You book the permit yourself on the park website."}}},"rentables":{"road-bike":{"name":"Road bike","price":{"per":"person-day","range":[25,40]}},"car":{"name":"Car","price":{"per":"day","range":[30,55]}}},"gear":{"helmet":{"name":"Helmet"},"shoes-road":{"name":"Road shoes (SPD-SL)"},"kit-bike":{"name":"Cycling kit"},"bottles":{"name":"2 bottles"},"food-ride":{"name":"Ride food for 4 h"},"glasses":{"name":"Sunglasses"},"sunscreen":{"name":"Sunscreen"},"jacket":{"name":"Wind jacket"},"swimwear":{"name":"Swimwear"},"towel":{"name":"Towel"},"wetsuit":{"name":"Wetsuit"},"goggles":{"name":"Goggles and swim cap"},"shoes-trail":{"name":"Trail shoes"},"hat":{"name":"Running cap"},"water-1500":{"name":"1.5 L water"},"snacks-run":{"name":"Run snacks"},"headtorch":{"name":"Head torch"},"daypack":{"name":"Day pack"},"own-bike":{"name":"Your bike in a bike bag"},"pedals":{"name":"Your pedals"}},"activities":{"ride-masca-teide":{"kind":"activity","sport":"road-bike","name":"Road ride: Masca → Teide → hotel","stats":"80 km · about 2,200 m up","level":"hard","durationMin":330,"area":"high","route":["masca","santiago","chio","parador","vilaflor","loscristianos"],"gear":["helmet","shoes-road","kit-bike","bottles","food-ride","glasses","sunscreen","jacket"],"needs":[{"kind":"rental","item":"road-bike","provider":"host"},{"kind":"transport","provider":"host","minutes":45,"label":"Host pickup: you and the bike to Masca","price":{"per":"trip","range":[40,60]}}],"conditions":{"maxWind":35,"maxRain":1},"alternatives":["ride-coast-south"]},"ride-coast-south":{"kind":"activity","sport":"road-bike","name":"Road ride: south coast to El Médano","stats":"55 km · about 500 m up","level":"medium","durationMin":180,"area":"coast","route":["loscristianos","elmedano","loscristianos"],"gear":["helmet","shoes-road","kit-bike","bottles","food-ride","glasses","sunscreen"],"needs":[{"kind":"rental","item":"road-bike","provider":"host"}],"conditions":{"maxWind":35,"maxRain":1}},"sup-loscristianos":{"kind":"activity","sport":"water","name":"SUP along Los Cristianos","stats":"2 h · easy","level":"easy","durationMin":120,"area":"coast","route":["loscristianos"],"gear":["swimwear","sunscreen","towel"],"needs":[],"support":["host"],"conditions":{"maxWind":20,"maxWave":1.0},"supportPrice":{"per":"person","range":[35,45]}},"trail-teide":{"kind":"activity","sport":"trail-run","name":"Trail run: Los Roques → Teide and back","stats":"30 km · 1,500 m up","level":"hard","durationMin":360,"area":"high","route":["losroques","summit","losroques"],"gear":["shoes-trail","glasses","hat","sunscreen","water-1500","snacks-run","headtorch","jacket"],"needs":[{"kind":"rental","item":"car","provider":"car"},{"kind":"transport","provider":"self","minutes":60,"label":"Drive to Los Roques"},{"kind":"permit","provider":"park","label":"Teide summit trail permit","note":"Free, limited daily slots. Book weeks ahead.","price":{"per":"trip","range":[0,0]}}],"support":["supacademy"],"conditions":{"maxWind":40,"needsPark":true},"supportPrice":{"per":"person","range":[60,90]}},"swim-2k":{"kind":"activity","sport":"water","name":"Open-water swim","stats":"2 km · Los Cristianos bay","level":"medium","durationMin":60,"area":"coast","route":["loscristianos"],"gear":["wetsuit","goggles","towel","sunscreen"],"needs":[],"support":["supacademy"],"conditions":{"maxWind":25,"maxWave":1.2},"supportPrice":{"per":"person","range":[30,45]}},"waterbike-3k":{"kind":"activity","sport":"water","name":"Water bike","stats":"3 km · light","level":"easy","durationMin":60,"area":"coast","route":["loscristianos"],"gear":["swimwear","sunscreen","towel"],"needs":[],"support":["supacademy"],"conditions":{"maxWind":25,"maxWave":1.5},"supportPrice":{"per":"person","range":[25,35]}},"leisure-explore":{"kind":"leisure","sport":"leisure","name":"Explore the island: Masca, Garachico, Puerto de la Cruz","stats":"Flexible · by car","durationMin":480,"area":"coast","route":["loscristianos","masca","garachico","puerto"],"gear":["daypack","sunscreen","swimwear"],"needs":[{"kind":"rental","item":"car","provider":"car"}],"conditions":{}},"rest-beach":{"kind":"leisure","sport":"leisure","name":"Rest and recover at the beach","stats":"No plan, no alarm","durationMin":240,"area":"coast","route":["loscristianos"],"gear":["swimwear","towel","sunscreen"],"needs":[],"conditions":{}}},"tasks":{"checkin":{"kind":"task","name":"Check in at the hotel"},"meet-host":{"kind":"task","name":"Meet your host and walk through the week"}},"pricing":{"currency":"EUR","note":"Estimates from public Tenerife prices, autumn 2026. Each provider confirms the real price."}},"template":{"id":"edd-tenerife","title":"Tenerife multi-sport week","by":"Edd","doneOn":"October 2019","season":"Best October to May. Teide can be closed after snow or storms.","start":"2026-11-09","days":[[{"ref":"checkin","at":"15:00"},{"ref":"meet-host","at":"19:00"}],[{"ref":"ride-masca-teide","at":"07:15","mode":"solo"},{"ref":"sup-loscristianos","at":"15:30","mode":"host"}],[{"ref":"trail-teide","at":"06:30","mode":"solo"}],[{"ref":"swim-2k","at":"09:00","mode":"supacademy"},{"ref":"waterbike-3k","at":"10:30","mode":"supacademy"}],[{"ref":"leisure-explore","at":"10:00"}]]},"forecasts":{"calm":{"label":"Calm week","days":[{"coast":{"wind":12,"wave":0.6,"rain":0,"temp":24},"high":{"wind":18,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":10,"wave":0.5,"rain":0,"temp":25},"high":{"wind":16,"rain":0,"temp":14},"parkOpen":true},{"coast":{"wind":14,"wave":0.7,"rain":0,"temp":24},"high":{"wind":22,"rain":0,"temp":12},"parkOpen":true},{"coast":{"wind":11,"wave":0.6,"rain":0,"temp":25},"high":{"wind":20,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":13,"wave":0.8,"rain":0,"temp":24},"high":{"wind":19,"rain":0,"temp":13},"parkOpen":true}]},"windy":{"label":"Wind on Teide, day 2","days":[{"coast":{"wind":12,"wave":0.6,"rain":0,"temp":24},"high":{"wind":18,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":14,"wave":0.7,"rain":0,"temp":24},"high":{"wind":48,"rain":0,"temp":9},"parkOpen":true},{"coast":{"wind":14,"wave":0.7,"rain":0,"temp":24},"high":{"wind":22,"rain":0,"temp":12},"parkOpen":true},{"coast":{"wind":11,"wave":0.6,"rain":0,"temp":25},"high":{"wind":20,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":13,"wave":0.8,"rain":0,"temp":24},"high":{"wind":19,"rain":0,"temp":13},"parkOpen":true}]},"closed":{"label":"Teide park closed, day 3","days":[{"coast":{"wind":12,"wave":0.6,"rain":0,"temp":24},"high":{"wind":18,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":10,"wave":0.5,"rain":0,"temp":25},"high":{"wind":16,"rain":0,"temp":14},"parkOpen":true},{"coast":{"wind":15,"wave":0.8,"rain":0,"temp":23},"high":{"wind":30,"rain":4,"temp":6},"parkOpen":false},{"coast":{"wind":11,"wave":0.6,"rain":0,"temp":25},"high":{"wind":20,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":13,"wave":0.8,"rain":0,"temp":24},"high":{"wind":19,"rain":0,"temp":13},"parkOpen":true}]},"swell":{"label":"Big swell, day 4","days":[{"coast":{"wind":12,"wave":0.6,"rain":0,"temp":24},"high":{"wind":18,"rain":0,"temp":13},"parkOpen":true},{"coast":{"wind":10,"wave":0.5,"rain":0,"temp":25},"high":{"wind":16,"rain":0,"temp":14},"parkOpen":true},{"coast":{"wind":14,"wave":0.7,"rain":0,"temp":24},"high":{"wind":22,"rain":0,"temp":12},"parkOpen":true},{"coast":{"wind":22,"wave":2.2,"rain":0,"temp":23},"high":{"wind":25,"rain":0,"temp":12},"parkOpen":true},{"coast":{"wind":13,"wave":0.8,"rain":0,"temp":24},"high":{"wind":19,"rain":0,"temp":13},"parkOpen":true}]}}}</script>
+<script>
+const SEED = JSON.parse(document.getElementById('seed').textContent);
+const C = SEED.catalog, TEMPLATE = SEED.template, FORECASTS = SEED.forecasts;
+const STORE_KEY = 'tenerife-companion-v2';
+
+/* ---------- Stored state: the only data that changes. Everything on screen is derived from it. ---------- */
+function forkTemplate(start) {
+  return {
+    forkedFrom: { id: TEMPLATE.id, by: TEMPLATE.by },
+    start: start || TEMPLATE.start,
+    days: TEMPLATE.days.map(d => d.map(s => ({ ...s }))),
+    tweaks: { ownBike: false },
+    travelers: 1,
+    packed: [],
+    requests: {}
+  };
+}
+let trip = load();
+const ui = { screen: trip ? 'app' : 'template', tab: 'plan', today: 1, evening: false, scenario: 'windy', open: {}, openActs: {}, prepOpen: {}, sheet: null, form: null, mapDay: 'all', startInput: TEMPLATE.start };
+
+function load() { try { const t = JSON.parse(localStorage.getItem(STORE_KEY)); return t && t.days && t.requests ? t : null; } catch (e) { return null; } }
+function save() { try { trip ? localStorage.setItem(STORE_KEY, JSON.stringify(trip)) : localStorage.removeItem(STORE_KEY); } catch (e) {} }
+
+/* ---------- Pure helpers ---------- */
+const item = ref => C.activities[ref] || C.tasks[ref];
+const toMin = hhmm => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+const fmt = min => { const m = ((min % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const forecast = d => FORECASTS[ui.scenario].days[d];
+function dayDate(t, d) { const dt = new Date(t.start + 'T12:00:00'); dt.setDate(dt.getDate() + d); return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
+
+function needsOf(t, slot) {
+  const a = item(slot.ref);
+  return (a.needs || []).filter(n => !(t.tweaks.ownBike && n.kind === 'rental' && n.item === 'road-bike'));
+}
+function gearOf(t, slot) {
+  const a = item(slot.ref);
+  const g = [...(a.gear || [])];
+  if (t.tweaks.ownBike && a.sport === 'road-bike') g.push('own-bike', 'pedals');
+  return g;
+}
+const provider = id => C.providers[id];
+const modeLabel = slot => !slot.mode || slot.mode === 'solo' ? 'Solo' : 'With ' + provider(slot.mode).short;
+
+/* Rentals span from the first to the last day any activity needs them. */
+function rentals(t) {
+  const map = {};
+  t.days.forEach((day, d) => day.forEach(slot => needsOf(t, slot).filter(n => n.kind === 'rental').forEach(n => {
+    const key = n.item + '|' + n.provider;
+    const r = map[key] || (map[key] = { key, item: n.item, provider: n.provider, first: d, last: d, lastSlot: slot });
+    if (d < r.first) r.first = d;
+    if (d >= r.last) { r.last = d; r.lastSlot = slot; }
+  })));
+  return Object.values(map);
+}
+
+/* Prices are estimates from the catalog; per-person items scale with the people on the request, else the trip's travellers. */
+const range = p => p ? p.range : [0, 0];
+const addR = (a, b) => [a[0] + b[0], a[1] + b[1]];
+function cost(t, b) { const n = b.perPerson ? ((b.request && b.request.people) || t.travelers || 1) : 1; return b.base.map(x => x * n); }
+const money = ([lo, hi]) => hi === 0 ? 'Free' : lo === hi ? `€${lo}` : `€${lo}–${hi}`;
+function totals(t) {
+  const list = bookings(t), z = [0, 0];
+  const sum = l => l.reduce((acc, b) => addR(acc, cost(t, b)), z);
+  return { list, all: sum(list), booked: sum(list.filter(b => b.booked)), open: sum(list.filter(b => !b.booked)), done: list.filter(b => b.booked).length };
+}
+
+/* Logistics that nobody types in: pickups, returns, shuttles and drives. */
+function derivedEntries(t, d) {
+  const out = [];
+  rentals(t).forEach(r => {
+    const name = C.rentables[r.item].name.toLowerCase();
+    const from = r.provider === 'host' ? 'your host' : provider(r.provider).name.toLowerCase();
+    const pickDay = Math.max(0, r.first - 1);
+    if (pickDay === d) out.push({ at: 18 * 60 + 30, text: `Pick up ${name} from ${from}` });
+    if (r.last === d) {
+      const end = toMin(r.lastSlot.at) + item(r.lastSlot.ref).durationMin + 15;
+      out.push({ at: end, text: `Return ${name} to ${from}` });
+    }
+  });
+  t.days[d].forEach(slot => needsOf(t, slot).filter(n => n.kind === 'transport').forEach(n => {
+    out.push({ at: toMin(slot.at) - n.minutes, text: n.label });
+  }));
+  return out;
+}
+
+function check(slot, d) {
+  const a = item(slot.ref), c = a.conditions || {}, f = forecast(d);
+  if (a.kind === 'task') return { ok: true, reasons: [] };
+  const zone = f[a.area], where = a.area === 'high' ? 'on Teide' : 'on the coast', reasons = [];
+  if (c.maxWind != null && zone.wind > c.maxWind) reasons.push(`Wind ${zone.wind} km/h ${where} (your limit ${c.maxWind})`);
+  if (c.maxRain != null && zone.rain > c.maxRain) reasons.push(`Rain ${zone.rain} mm ${where}`);
+  if (c.maxWave != null && f.coast.wave > c.maxWave) reasons.push(`Swell ${f.coast.wave} m (limit ${c.maxWave} m)`);
+  if (c.needsPark && !f.parkOpen) reasons.push('Teide national park access is closed');
+  return { ok: reasons.length === 0, reasons };
+}
+
+/* Swap suggestions are a query: what else fits this day, and does this activity fit another day? */
+function suggestions(t, d, i) {
+  const slot = t.days[d][i], out = [];
+  (item(slot.ref).alternatives || []).forEach(alt => {
+    if (check({ ref: alt }, d).ok) out.push({ label: `Switch to ${shortName(alt)}`, op: ['replace', d, i, alt] });
+  });
+  for (let e = ui.today; e < t.days.length; e++) {
+    if (e === d) continue;
+    t.days[e].forEach((other, j) => {
+      if (item(other.ref).kind === 'task') return;
+      if (check(slot, e).ok && check(other, d).ok) out.push({ label: `Swap with day ${e + 1}: ${shortName(other.ref)}`, op: ['swap', d, i, e, j] });
+    });
+  }
+  return out.slice(0, 2).concat({ label: 'Make it a rest day', op: ['replace', d, i, 'rest-beach'] });
+}
+const shortName = ref => { const n = item(ref).name; return n.startsWith('Road ride') ? n.replace('Road ride: ', 'Ride: ') : n.split(':')[0].replace('Explore the island', 'Explore'); };
+
+function packList(t, d) {
+  const map = {};
+  t.days[d].forEach(slot => gearOf(t, slot).forEach(g => { (map[g] = map[g] || []).push(shortName(slot.ref)); }));
+  return Object.entries(map).map(([id, by]) => ({ id, name: C.gear[id].name, by: [...new Set(by)] }));
+}
+
+/* Every booking the plan needs. needBy = the day it is first used, so tonight's prep can list what tomorrow needs. */
+function bookings(t) {
+  const out = [];
+  rentals(t).forEach(r => {
+    const pick = Math.max(0, r.first - 1), days = Math.max(1, r.last - pick), pr = C.rentables[r.item].price;
+    out.push({
+      base: range(pr).map(x => x * days), perPerson: !!pr && pr.per === 'person-day', unit: `${days} day${days === 1 ? '' : 's'}`,
+      id: 'rent:' + r.key, kind: 'rental', rentable: r.item, provider: r.provider, needBy: r.first,
+      icon: r.item === 'car' ? 'car' : 'bike', title: C.rentables[r.item].name + ' rental',
+      detail: `Day ${pick + 1} evening to day ${r.last + 1} · ${provider(r.provider).name}`,
+      when: `Pick up day ${pick + 1} (${dayDate(t, pick)}) at 18:30, return day ${r.last + 1} (${dayDate(t, r.last)})`,
+      items: [`${C.rentables[r.item].name}, used on day ${r.first === r.last ? r.first + 1 : `${r.first + 1} to ${r.last + 1}`}`]
+    });
+  });
+  t.days.forEach((day, d) => {
+    const byProv = {};
+    day.forEach(slot => { if (slot.mode && slot.mode !== 'solo') (byProv[slot.mode] = byProv[slot.mode] || []).push(slot); });
+    Object.entries(byProv).forEach(([p, slots]) => out.push({
+      id: `sup:${d}:${p}`, kind: 'session', provider: p, needBy: d, icon: 'water',
+      base: slots.reduce((acc, s) => addR(acc, range(item(s.ref).supportPrice)), [0, 0]), perPerson: true, unit: 'per person',
+      title: `${provider(p).name}: ${slots.map(s => shortName(s.ref)).join(' + ')}`,
+      detail: `Day ${d + 1}` + (slots.length > 1 ? ` · ${slots.length} activities, one booking` : ''),
+      when: `Day ${d + 1} (${dayDate(t, d)})`,
+      items: slots.map(s => `${s.at} · ${item(s.ref).name}`)
+    }));
+    day.forEach(slot => needsOf(t, slot).forEach(n => {
+      if (n.kind === 'permit') out.push({
+        id: `permit:${slot.ref}`, kind: 'permit', provider: n.provider, needBy: d, icon: 'alert', title: n.label, base: range(n.price), perPerson: false, unit: '',
+        detail: `Day ${d + 1} · ${n.note}`, when: `Day ${d + 1} (${dayDate(t, d)})`, items: [n.note]
+      });
+      if (n.kind === 'transport' && n.provider !== 'self') out.push({
+        id: `shuttle:${slot.ref}`, kind: 'shuttle', provider: n.provider, needBy: d, icon: 'car', base: range(n.price), perPerson: false, unit: 'per trip',
+        title: `Shuttle by ${provider(n.provider).short}`, detail: `Day ${d + 1} · ${n.label}`,
+        when: `Day ${d + 1} (${dayDate(t, d)}) at ${fmt(toMin(slot.at) - n.minutes)}`, items: [n.label]
+      });
+    }));
+  });
+  return out.sort((a, b) => a.needBy - b.needBy).map(b => ({ ...b, request: t.requests[b.id] || null, booked: !!t.requests[b.id] }));
+}
+
+/* The bookings one slot depends on, for the activity's detail panel. */
+function slotBookingIds(d, slot) {
+  const ids = needsOf(trip, slot).map(n =>
+    n.kind === 'rental' ? `rent:${n.item}|${n.provider}` : n.kind === 'permit' ? `permit:${slot.ref}` : n.kind === 'transport' && n.provider !== 'self' ? `shuttle:${slot.ref}` : null);
+  if (slot.mode && slot.mode !== 'solo') ids.push(`sup:${d}:${slot.mode}`);
+  return ids.filter(Boolean);
+}
+
+function bookingRow(b) {
+  const label = b.booked ? (b.kind === 'permit' ? 'Booked' : 'Requested') : 'Book';
+  return `<div class="bk">${icon(b.icon)}<span style="min-width:0">${esc(b.title)}${b.request && b.request.ref ? `<br><span class="tiny">${esc(b.request.ref)}</span>` : ''}<br><span class="price">≈ ${money(cost(trip, b))}</span></span><button class="chip ${b.booked ? 'ok' : 'solid'}" data-act="openSheet" data-id="${esc(b.id)}">${label}</button></div>`;
+}
+
+function firstStart(t, d) {
+  const times = t.days[d].filter(s => item(s.ref).kind !== 'task').map(s => toMin(s.at)).concat(derivedEntries(t, d).map(e => e.at).filter(x => x < 12 * 60));
+  return times.length ? Math.min(...times) : null;
+}
+
+/* ---------- Icons ---------- */
+const P = {
+  bike: '<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9 8.5 6H7M15 9l-3 7"/>',
+  run: '<circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 2v5M6 12l3-3h4l2 3 3 1M11 15l1-6"/>',
+  water: '<path d="M3 9c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0M3 15c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  task: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>',
+  car: '<path d="M4 16v-4l2-5h12l2 5v4zM4 16v2M20 16v2"/><circle cx="8" cy="13.5" r="1"/><circle cx="16" cy="13.5" r="1"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/>',
+  alert: '<path d="M12 3l10 18H2zM12 10v5M12 18v.5"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  bag: '<path d="M6 8h12l-1 13H7zM9 8V6a3 3 0 0 1 6 0v2"/>',
+  receipt: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+  map: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
+  plan: '<path d="M4 6h16M4 12h16M4 18h10"/>',
+  fork: '<circle cx="6" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><path d="M6 7v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V7M12 12v5"/>',
+  wind: '<path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h8"/>',
+  chev: '<path d="M6 9l6 6 6-6"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>'
+};
+const icon = (n, extra = '') => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${P[n]}</svg>`;
+const sportIcon = a => a.kind === 'task' ? 'task' : ({ 'road-bike': 'bike', 'trail-run': 'run', water: 'water', leisure: 'sun' })[a.sport];
+
+/* ---------- Screens ---------- */
+function renderTemplate() {
+  const t = forkTemplate(TEMPLATE.start);
+  const acts = t.days.flat().filter(s => item(s.ref).kind === 'activity');
+  const gearCount = new Set(t.days.flatMap(d => d.flatMap(s => gearOf(t, s)))).size;
+  const provs = new Set(t.days.flat().map(s => s.mode).filter(m => m && m !== 'solo').concat(rentals(t).map(r => r.provider)));
+  return `<div class="scroll">
+    <p class="eyebrow">Tenerife · Canary Islands</p>
+    <h1 style="margin-top:6px">${esc(TEMPLATE.title)}</h1>
+    <div class="row" style="margin-top:12px"><div class="avatar">E</div><div class="small"><b>Done by ${esc(TEMPLATE.by)}</b><br><span class="tiny">${esc(TEMPLATE.doneOn)} · real routes, real providers</span></div></div>
+    <div class="stats"><div><b>${t.days.length}</b><span>days</span></div><div><b>${acts.length}</b><span>activities</span></div><div><b>${provs.size}</b><span>local providers</span></div></div>
+    <p class="small muted" style="margin:14px 0 0">${esc(TEMPLATE.season)}</p>
+    <div class="hero-card" style="margin-top:16px">
+      <ul class="prev">${t.days.map((day, d) => `<li><span class="dot">${d + 1}</span><span>${day.filter(s => item(s.ref).kind !== 'task').map(s => esc(item(s.ref).name)).join('<br>') || '<span class="muted">Arrive, check in, meet your host</span>'}</span></li>`).join('')}</ul>
+    </div>
+    <p class="small" style="margin:12px 0 0"><b>≈ ${money(totals(t).all)}</b> <span class="muted">per person in bookings: bike, car, sessions, shuttle. Flights and stay not included.</span></p>
+    <p class="tiny" style="margin-top:6px">Comes with ${gearCount} gear items to pack and every booking listed. You change any day after you take it.</p>
+    <div class="sticky-cta">
+      <label class="field" for="start">Your first day<input type="date" id="start" value="${ui.startInput}"></label>
+      <button class="btn primary" data-act="fork">${icon('fork')} Use this plan</button>
+    </div>
+  </div>`;
+}
+
+function renderPlan() {
+  const t = trip, last = t.days.length - 1;
+  const tom = Math.min(ui.today + 1, last);
+  let html = `<div class="scroll">
+    <div class="row" style="justify-content:space-between"><p class="eyebrow">${esc(dayDate(t, 0))} – ${esc(dayDate(t, last))}</p>
+    <button class="chip accent" data-act="template">${icon('fork', 'style="width:12px;height:12px"')} from ${esc(t.forkedFrom.by)}'s plan</button></div>
+    <h1 style="margin:6px 0 10px">${ui.evening ? 'Good evening' : 'Good morning'}</h1>`;
+  const tot = totals(t);
+  html = html.replace('<div class="scroll">', `<div class="scroll"><p class="demo-hint">${icon('alert', 'style="width:14px;height:14px;margin-top:1px"')}<span>Demo: change the day, time and weather with the demo controls <span class="where"></span>.</span></p>`);
+  html += `<button class="cost" data-act="tab" data-v="bookings" style="width:100%;text-align:left;margin:0 0 6px;padding:12px">
+    <span class="row" style="justify-content:space-between"><b style="font-weight:600;font-size:13px">${tot.done} of ${tot.list.length} booked</b><span class="price">≈ ${money(tot.all)} total</span></span>
+    <span class="bar"><span style="width:${tot.list.length ? Math.round(tot.done / tot.list.length * 100) : 0}%"></span></span></button>`;
+
+  t.days.forEach((day, d) => {
+    const f = forecast(d), state = d < ui.today ? 'past' : d === ui.today ? 'today' : 'future';
+    const open = ui.open[d] != null ? ui.open[d] : state === 'today';
+    const acts = day.filter(s => item(s.ref).kind !== 'task');
+    const risky = state !== 'past' && day.some(s => !check(s, d).ok);
+    const title = acts.length ? acts.map(s => shortName(s.ref)).join(' + ') : 'Arrive';
+    html += `<section class="day ${state}">
+      <button class="day-head" data-act="toggleDay" data-d="${d}" aria-expanded="${!!open}">
+        <span class="dot">${state === 'past' ? icon('check', 'style="width:14px;height:14px"') : d + 1}</span>
+        <span><b style="font-weight:600">${state === 'today' ? 'Today' : state === 'future' && d === ui.today + 1 ? 'Tomorrow' : 'Day ' + (d + 1)}</b> · ${esc(title)}</span>
+        ${risky ? `<span class="chip warn">${icon('alert', 'style="width:12px;height:12px"')} at risk</span>` : ''}
+        <span class="wx">${icon(f.coast.wind > 20 || f.high.wind > 35 ? 'wind' : 'sun', 'style="width:14px;height:14px"')}${f.coast.temp}°</span>
+        <span class="chev">${icon('chev', 'style="width:16px;height:16px"')}</span>
+      </button>`;
+    if (state === 'today' && !open) html += `<p class="summary">${esc(dayDate(t, d))} · ${acts.length} planned · tap to open</p>`;
+    if (state === 'past' && !open) html += `<p class="summary">${esc(dayDate(t, d))} · done</p>`;
+    if (open) html += renderDayBody(t, d, state);
+    if (d === tom && ui.today < last && d !== ui.today) html += renderPrep(t, d);
+    html += `</section>`;
+  });
+  return html + `</div>`;
+}
+
+function renderDayBody(t, d, state) {
+  const entries = t.days[d].map((slot, i) => ({ at: toMin(slot.at), slot, i }))
+    .concat(derivedEntries(t, d).map(e => ({ ...e, derived: true })))
+    .sort((a, b) => a.at - b.at);
+  let html = '';
+  if (state !== 'past') t.days[d].forEach((slot, i) => {
+    const c = check(slot, d);
+    if (c.ok) return;
+    html += `<div class="alert"><div class="row" style="font-weight:600;font-size:14px">${icon('alert')} ${esc(shortName(slot.ref))} is at risk</div>
+      <p>${c.reasons.map(esc).join('. ')}.</p>
+      <div class="btns">${suggestions(t, d, i).map((s, k) => `<button class="btn sm" data-act="apply" data-d="${d}" data-i="${i}" data-k="${k}">${esc(s.label)}</button>`).join('')}</div></div>`;
+  });
+  html += `<ul class="tl">` + entries.map(e => {
+    if (e.derived) return `<li class="derived"><span class="t">${fmt(e.at)}</span><span class="m"></span><span class="what">${esc(e.text)}</span></li>`;
+    const a = item(e.slot.ref), c = check(e.slot, d);
+    if (a.kind === 'task') return `<li><span class="t">${fmt(e.at)}</span><span class="m"></span><span class="what">${esc(a.name)}</span></li>`;
+    const canSupport = (a.support || []).length && state !== 'past';
+    return `<li class="act sport-${a.sport}"><span class="t">${fmt(e.at)}</span><span class="m"></span><span class="what"><b>${esc(a.name)}</b><br><span class="tiny">${esc(a.stats)}</span>
+      <span class="tags">${a.kind === 'activity' ? (canSupport ? `<button class="chip" data-act="mode" data-d="${d}" data-i="${e.i}" title="Switch between solo and supported">${esc(modeLabel(e.slot))}</button>` : `<span class="chip">${esc(modeLabel(e.slot))}</span>`) : ''}
+      ${state === 'past' ? '' : c.ok ? (a.kind === 'activity' ? '<span class="chip ok">conditions OK</span>' : '') : '<span class="chip warn">at risk</span>'}</span>${actDetail(d, e.i, e.slot, state)}</span></li>`;
+  }).join('') + `</ul>`;
+  return html;
+}
+
+/* Tap "Details" on any activity: gear, what it needs, conditions against the forecast, and its bookings. */
+function actDetail(d, i, slot, state) {
+  const key = d + ':' + i, open = !!ui.openActs[key], a = item(slot.ref);
+  let html = `<button class="more" data-act="toggleAct" data-key="${key}" aria-expanded="${open}">${open ? 'Hide details' : 'Details'} ${icon('chev')}</button>`;
+  if (!open) return html;
+  const gear = gearOf(trip, slot).map(g => C.gear[g].name);
+  const needs = needsOf(trip, slot).map(n => n.kind === 'rental' ? `${C.rentables[n.item].name} from ${provider(n.provider).name.toLowerCase()}` : n.kind === 'transport' ? `${n.label} (${n.minutes} min)` : n.label);
+  const c = a.conditions || {}, f = forecast(d), zone = f[a.area], rows = [];
+  if (c.maxWind != null) rows.push([`Wind ${zone.wind} km/h`, `limit ${c.maxWind}`, zone.wind <= c.maxWind]);
+  if (c.maxRain != null) rows.push([`Rain ${zone.rain} mm`, `limit ${c.maxRain}`, zone.rain <= c.maxRain]);
+  if (c.maxWave != null) rows.push([`Swell ${f.coast.wave} m`, `limit ${c.maxWave}`, f.coast.wave <= c.maxWave]);
+  if (c.needsPark) rows.push([`Teide park ${f.parkOpen ? 'open' : 'closed'}`, 'must be open', f.parkOpen]);
+  const bks = bookings(trip).filter(b => slotBookingIds(d, slot).includes(b.id));
+  html += `<div class="detail">
+    ${gear.length ? `<div><h4>Pack</h4><ul>${gear.map(g => `<li>${icon('bag', 'style="width:14px;height:14px"')}${esc(g)}</li>`).join('')}</ul></div>` : ''}
+    ${needs.length ? `<div><h4>Needs</h4><ul>${needs.map(n => `<li>${icon('receipt', 'style="width:14px;height:14px"')}${esc(n)}</li>`).join('')}</ul></div>` : ''}
+    ${rows.length && state !== 'past' ? `<div><h4>Conditions, ${esc(dayDate(trip, d))}</h4><ul>${rows.map(([v, lim, ok]) => `<li><span class="${ok ? 'cond-ok' : 'cond-bad'}">${esc(v)}</span><span class="tiny">${esc(lim)}</span></li>`).join('')}</ul></div>` : ''}
+    ${bks.length && state !== 'past' ? `<div><h4>Bookings</h4><div class="stack" style="gap:8px">${bks.map(bookingRow).join('')}</div></div>` : ''}
+  </div>`;
+  return html;
+}
+
+function renderPrep(t, d) {
+  const items = packList(t, d), todo = items.filter(g => !t.packed.includes(d + ':' + g.id));
+  const due = bookings(t).filter(b => b.needBy === d), open = due.filter(b => !b.booked);
+  const fs = firstStart(t, d);
+  const wake = fs != null ? fs - 60 : null;
+  const checks = t.days[d].filter(s => item(s.ref).conditions && item(s.ref).conditions.needsPark);
+  const expanded = ui.prepOpen[d] != null ? ui.prepOpen[d] : ui.evening;
+  const summary = `${todo.length ? `Pack ${todo.length} item${todo.length === 1 ? '' : 's'}` : 'All packed'}${open.length ? `, ${open.length} booking${open.length === 1 ? '' : 's'} open` : ''}${wake != null ? `, alarm ${fmt(wake)}` : ''}`;
+  return `<div class="prep ${ui.evening ? 'focus' : ''}">
+    <button class="prep-head" data-act="togglePrep" data-d="${d}" aria-expanded="${expanded}">${icon('bag')}<span><b style="font-weight:600">Tonight, for tomorrow</b><br><span class="tiny">${summary}</span></span><span class="chev">${icon('chev')}</span></button>
+    ${expanded ? `
+    ${items.map(g => { const on = t.packed.includes(d + ':' + g.id); return `<button class="check" data-act="pack" data-key="${d}:${g.id}" aria-pressed="${on}"><span class="box">${on ? icon('check', 'style="width:12px;height:12px"') : ''}</span><span class="lbl">${esc(g.name)}</span><span class="why">${esc(g.by.join(' + '))}</span></button>`; }).join('')}
+    ${checks.map(() => `<div class="row" style="color:var(--warn)">${icon('alert')} Check Teide park access at 20:00</div>`).join('')}
+    ${due.map(bookingRow).join('')}
+    ${wake != null ? `<div class="row">${icon('moon')} Sleep by ${fmt(wake - 8 * 60)} for a ${fmt(wake)} alarm</div>` : ''}` : ''}
+  </div>`;
+}
+
+function renderGear() {
+  const t = trip, map = {};
+  t.days.forEach((day, d) => day.forEach(slot => gearOf(t, slot).forEach(g => { (map[g] = map[g] || new Set()).add(d + 1); })));
+  const all = Object.entries(map);
+  return `<div class="scroll"><p class="eyebrow">Whole trip</p><h1 style="margin:6px 0 4px">Gear</h1>
+    <p class="small muted" style="margin:0 0 14px">${all.length} items for ${t.days.flat().filter(s => item(s.ref).kind === 'activity').length} activities. Each item is listed once, with the days you need it.</p>
+    <button class="toggle" data-act="ownBike" aria-pressed="${t.tweaks.ownBike}"><span><b>Bringing your own bike</b><br><span class="tiny">Drops the bike rental and pickups, adds a bike bag and pedals</span></span><span class="sw"></span></button>
+    <ul class="list" style="margin-top:8px">${all.map(([id, days]) => `<li class="row"><span style="flex:1">${esc(C.gear[id].name)}</span><span class="tiny">day ${[...days].join(', ')}</span></li>`).join('')}</ul></div>`;
+}
+
+function renderBookings() {
+  const tot = totals(trip), list = tot.list, done = tot.done, n = trip.travelers || 1;
+  return `<div class="scroll"><p class="eyebrow">${done} of ${list.length} booked</p><h1 style="margin:6px 0 4px">Bookings</h1>
+    <p class="small muted" style="margin:0 0 6px">Built from what each day needs. Send a request in two taps; the provider confirms directly.</p>
+    <div class="cost">
+      <span class="eyebrow">Estimated trip cost</span>
+      <span class="big">≈ ${money(tot.all)}</span>
+      <span class="tiny">${n > 1 ? `≈ ${money(tot.all.map(x => Math.round(x / n)))} each · ` : ''}flights and stay not included</span>
+      <span class="bar" role="img" aria-label="${done} of ${list.length} booked"><span style="width:${list.length ? Math.round(done / list.length * 100) : 0}%"></span></span>
+      <div class="split"><span>Booked<b>${tot.booked[1] ? money(tot.booked) : '€0'}</b></span><span>Still to book<b>${money(tot.open)}</b></span></div>
+      <div class="row" style="justify-content:space-between"><span class="small">Travellers</span><span class="stepper"><button data-act="travelers" data-v="-1" aria-label="One fewer traveller">−</button><b>${n}</b><button data-act="travelers" data-v="1" aria-label="One more traveller">+</button></span></div>
+      <span class="tiny">${esc(C.pricing.note)}</span>
+    </div>
+    <ul class="list">${list.map(b => `<li><div class="row" style="align-items:flex-start">${icon(b.icon)}<div style="flex:1;min-width:0"><b style="font-weight:600">${esc(b.title)}</b><br><span class="tiny">${esc(b.detail)}</span><br><span class="price">≈ ${money(cost(trip, b))}${b.unit && b.base[1] ? ` · ${esc(b.unit)}` : ''}</span>${b.request && b.request.ref ? `<br><span class="tiny">Request ${esc(b.request.ref)}${b.request.people ? ` · ${b.request.people} ${b.request.people === 1 ? 'person' : 'people'}` : ''}</span>` : ''}</div>
+      <button class="chip ${b.booked ? 'ok' : 'solid'}" data-act="openSheet" data-id="${esc(b.id)}">${b.booked ? (b.kind === 'permit' ? 'Booked' : 'Requested') : 'Book'}</button></div></li>`).join('')}</ul></div>`;
+}
+
+/* The booking sheet: a request the provider confirms. In this prototype nothing leaves the page. */
+function renderSheet() {
+  const b = bookings(trip).find(x => x.id === ui.sheet);
+  if (!b) return '';
+  const p = provider(b.provider), f = ui.form, req = b.request;
+  let body;
+  if (req) {
+    body = `<div class="status"><b>${b.kind === 'permit' ? 'Marked as booked' : 'Request sent'}</b>${req.ref ? `Reference ${esc(req.ref)}` : ''}${req.people ? ` · ${req.people} ${req.people === 1 ? 'person' : 'people'}` : ''}${req.size ? ` · size ${esc(req.size)}` : ''}${req.note ? `<br>Note: ${esc(req.note)}` : ''}</div>
+      <p class="small muted" style="margin:0">${esc(p.book.confirms)}</p>
+      <button class="btn ghost" data-act="cancelRequest">${b.kind === 'permit' ? 'Mark as not booked' : 'Cancel request'}</button>`;
+  } else if (b.kind === 'permit') {
+    body = `<p class="small" style="margin:0">${esc(p.book.confirms)} Book it before anything else: slots run out weeks ahead.</p>
+      <a class="btn ghost" href="${esc(p.book.url)}" target="_blank" rel="noopener">Open the park booking site</a>
+      <button class="btn primary" data-act="sendRequest">I've booked it</button>`;
+  } else {
+    body = `<div><span class="eyebrow">People</span><div class="stepper" style="margin-top:6px"><button data-act="people" data-v="-1" aria-label="One fewer person">−</button><b>${f.people}</b><button data-act="people" data-v="1" aria-label="One more person">+</button></div></div>
+      ${b.rentable === 'road-bike' ? `<label class="field" for="bk-size">Frame size<select id="bk-size">${['S', 'M', 'L', 'XL'].map(s => `<option ${s === f.size ? 'selected' : ''}>${s}</option>`).join('')}</select></label>` : ''}
+      <label class="field" for="bk-note">Note for ${esc(p.name.toLowerCase())}<textarea id="bk-note" placeholder="Pedals: Shimano SPD-SL, please">${esc(f.note)}</textarea></label>
+      <p class="tiny" style="margin:0">Sent via ${esc(p.book.channel)}. ${esc(p.book.confirms)} Price is confirmed by the provider.</p>
+      <button class="btn primary" data-act="sendRequest">Send booking request</button>`;
+  }
+  return `<div class="sheet-wrap" data-act="closeSheet" data-self="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(b.title)}">
+    <div class="grab"></div>
+    <div class="row" style="align-items:flex-start"><div style="flex:1;min-width:0"><p class="eyebrow" style="margin:0">${esc(p.name)}</p><h2 style="margin-top:4px">${esc(b.title)}</h2></div><button data-act="closeSheet" aria-label="Close">${icon('x')}</button></div>
+    <dl class="kv"><dt>When</dt><dd>${esc(b.when)}</dd><dt>What</dt><dd>${b.items.map(esc).join('<br>')}</dd><dt>Estimate</dt><dd>≈ ${money(cost(trip, req ? b : { ...b, request: { people: f.people } }))}${b.perPerson ? ` for ${(req && req.people) || f.people} ${((req && req.people) || f.people) === 1 ? 'person' : 'people'}` : ''}</dd></dl>
+    ${body}
+    <p class="tiny" style="margin:0;text-align:center">Prototype: no request actually leaves this page.</p>
+  </div></div>`;
+}
+
+const OUTLINE = [[28.58,-16.13],[28.47,-16.25],[28.35,-16.37],[28.28,-16.39],[28.13,-16.43],[28.04,-16.54],[28.02,-16.65],[28.05,-16.72],[28.12,-16.77],[28.17,-16.81],[28.24,-16.84],[28.30,-16.88],[28.34,-16.92],[28.38,-16.86],[28.37,-16.76],[28.41,-16.62],[28.42,-16.55],[28.47,-16.43],[28.57,-16.33],[28.59,-16.20]];
+function renderMap() {
+  const t = trip, W = 340, H = 300;
+  const x = lng => (lng + 16.96) / 0.86 * W, y = lat => (28.62 - lat) / 0.62 * H;
+  const pt = id => { const p = C.places[id]; return [x(p.lng), y(p.lat)]; };
+  const color = a => ({ 'road-bike': 'var(--bike)', 'trail-run': 'var(--run)', water: 'var(--water)', leisure: 'var(--leisure)' })[a.sport];
+  const shown = t.days.map((day, d) => ({ d, slots: day.filter(s => item(s.ref).route) })).filter(x => ui.mapDay === 'all' || x.d === +ui.mapDay);
+  let marks = '', lines = '', legend = '';
+  shown.forEach(({ d, slots }) => slots.forEach(s => {
+    const a = item(s.ref), pts = a.route.map(pt);
+    if (pts.length > 1) lines += `<polyline points="${pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="${color(a)}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" ${a.kind === 'leisure' ? 'stroke-dasharray="4 4"' : ''}/>`;
+    const [sx, sy] = pts[0];
+    marks += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="9" fill="${color(a)}"/><text x="${sx.toFixed(1)}" y="${(sy + 3).toFixed(1)}" text-anchor="middle" style="fill:var(--surface);font-weight:700">${d + 1}</text>`;
+    legend += `<li class="row small"><span class="dot" style="background:${color(a)};color:var(--surface)">${d + 1}</span><span>${esc(a.name)}</span></li>`;
+  }));
+  const [bx, by] = pt(C.destination.base);
+  return `<div class="scroll"><p class="eyebrow">Drawn from your plan</p><h1 style="margin:6px 0 0">Map</h1>
+    <div class="filters">${['all', ...t.days.map((_, d) => String(d))].map(v => `<button class="chip" data-act="mapDay" data-v="${v}" aria-pressed="${ui.mapDay === v}">${v === 'all' ? 'All days' : 'Day ' + (+v + 1)}</button>`).join('')}</div>
+    <svg class="map" viewBox="0 0 ${W} ${H}" role="img" aria-label="Schematic map of Tenerife with the plan's routes">
+      <polygon class="land" points="${OUTLINE.map(([la, ln]) => x(ln).toFixed(1) + ',' + y(la).toFixed(1)).join(' ')}"/>
+      <text x="${x(-16.642) + 6}" y="${y(28.272) - 6}">Teide</text>
+      ${lines}${marks}
+      <rect x="${bx - 5}" y="${by + 8}" width="10" height="10" rx="2" fill="var(--ink)"/><text x="${bx + 9}" y="${by + 17}">Hotel</text>
+    </svg>
+    <p class="tiny" style="margin:6px 0 12px">Schematic. In the real build this layer is MapLibre tiles plus the same points and GPX lines.</p>
+    <ul class="list stack" style="gap:8px">${legend || '<li class="small muted">Nothing with a route on this day.</li>'}</ul></div>`;
+}
+
+function renderTabs() {
+  const open = bookings(trip).filter(b => !b.booked).length;
+  const tabs = [['plan', 'plan', 'Plan'], ['gear', 'bag', 'Gear'], ['bookings', 'receipt', 'Bookings'], ['map', 'map', 'Map']];
+  return `<nav class="tabs">${tabs.map(([id, ic, label]) => `<button data-act="tab" data-v="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${icon(ic)}<span>${label}${id === 'bookings' && open ? `<span class="count">${open}</span>` : ''}</span></button>`).join('')}</nav>`;
+}
+
+function renderSide() {
+  const stored = trip ? JSON.stringify(trip, null, 1) : 'null  // nothing stored until you tap "Use this plan"';
+  const bytes = trip ? new Blob([JSON.stringify(trip)]).size : 0;
+  return `<section class="panel demo"><h2><span class="demo-tag">DEMO</span>Demo controls</h2><p class="small muted" style="margin:0">Not part of the app. In the real app the clock and the live forecast do this. Try a different day or forecast and watch the plan react.</p>
+    <div class="ctl"><span class="eyebrow">Today is</span><div class="seg">${(trip || TEMPLATE).days.map((_, d) => `<button data-act="today" data-v="${d}" aria-pressed="${ui.today === d}">Day ${d + 1}</button>`).join('')}</div></div>
+    <div class="ctl"><span class="eyebrow">Time</span><div class="seg"><button data-act="evening" data-v="0" aria-pressed="${!ui.evening}">07:00</button><button data-act="evening" data-v="1" aria-pressed="${ui.evening}">20:00</button></div></div>
+    <div class="ctl"><span class="eyebrow">Forecast</span><div class="seg">${Object.entries(FORECASTS).map(([k, f]) => `<button data-act="scenario" data-v="${k}" aria-pressed="${ui.scenario === k}">${esc(f.label)}</button>`).join('')}</div></div>
+    <div class="ctl"><button class="btn ghost sm" data-act="reset">Start over from the template</button></div></section>
+    <section class="panel"><h2>Stored state</h2><p class="small muted" style="margin:0">This is everything the app saves: ${bytes} bytes. Swaps, ticks, booking requests and the bike toggle change it; nothing else does.</p>
+    <pre class="state">${esc(stored)}</pre>
+    <p class="small" style="margin:12px 0 0"><b>Derived on every render:</b></p>
+    <ul class="derives"><li>Timeline with pickups, returns, shuttles</li><li>Condition checks and swap suggestions</li><li>Pack lists, per day and for the trip</li><li>Bookings, with rentals spanning days</li><li>Sleep and alarm times, and the map</li></ul></section>`;
+}
+
+function render() {
+  const screen = document.getElementById('screen');
+  if (ui.screen === 'template' || !trip) screen.innerHTML = renderTemplate();
+  else screen.innerHTML = ({ plan: renderPlan, gear: renderGear, bookings: renderBookings, map: renderMap })[ui.tab]() + renderTabs() + (ui.sheet ? renderSheet() : '');
+  document.getElementById('side').innerHTML = renderSide();
+}
+
+/* ---------- Actions: the only code that writes to trip ---------- */
+const lastSuggestions = {};
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el) return;
+  const { act, v, d, i, k, id, key } = el.dataset;
+  if (act === 'closeSheet' && el.dataset.self && ev.target !== el) return;
+  const scrollEl = document.querySelector('.scroll'), keep = scrollEl ? scrollEl.scrollTop : 0;
+  let resetScroll = false;
+  switch (act) {
+    case 'fork': trip = forkTemplate(ui.startInput); ui.screen = 'app'; ui.tab = 'plan'; resetScroll = true; break;
+    case 'template': ui.screen = 'template'; resetScroll = true; break;
+    case 'reset': trip = null; ui.screen = 'template'; ui.open = {}; resetScroll = true; break;
+    case 'tab': ui.tab = v; resetScroll = true; break;
+    case 'toggleDay': { const cur = ui.open[d] != null ? ui.open[d] : +d === ui.today; ui.open[d] = !cur; break; }
+    case 'today': ui.today = +v; ui.open = {}; break;
+    case 'evening': ui.evening = v === '1'; break;
+    case 'scenario': ui.scenario = v; break;
+    case 'mapDay': ui.mapDay = v; break;
+    case 'ownBike': trip.tweaks.ownBike = !trip.tweaks.ownBike; break;
+    case 'pack': trip.packed = trip.packed.includes(key) ? trip.packed.filter(x => x !== key) : [...trip.packed, key]; break;
+    case 'toggleAct': ui.openActs[key] = !ui.openActs[key]; break;
+    case 'togglePrep': {
+      const cur = ui.prepOpen[d] != null ? ui.prepOpen[d] : ui.evening;
+      ui.prepOpen[d] = !cur; break;
+    }
+    case 'openSheet': ui.sheet = id; ui.form = { people: trip.travelers || 1, size: 'M', note: '' }; break;
+    case 'travelers': trip.travelers = Math.min(8, Math.max(1, (trip.travelers || 1) + Number(v))); break;
+    case 'closeSheet': ui.sheet = null; break;
+    case 'people': ui.form.people = Math.min(8, Math.max(1, ui.form.people + Number(v))); break;
+    case 'sendRequest': {
+      const b = bookings(trip).find(x => x.id === ui.sheet);
+      trip.requests = { ...trip.requests, [ui.sheet]: b.kind === 'permit'
+        ? { status: 'booked' }
+        : { status: 'requested', ref: 'TF-' + Math.floor(1000 + Math.random() * 9000), people: ui.form.people, size: b.rentable === 'road-bike' ? ui.form.size : undefined, note: ui.form.note.trim() || undefined } };
+      break;
+    }
+    case 'cancelRequest': { const r = { ...trip.requests }; delete r[ui.sheet]; trip.requests = r; break; }
+    case 'mode': {
+      const slot = trip.days[+d][+i], opts = ['solo', ...item(slot.ref).support];
+      slot.mode = opts[(opts.indexOf(slot.mode || 'solo') + 1) % opts.length]; break;
+    }
+    case 'apply': {
+      const op = suggestions(trip, +d, +i)[+k].op;
+      if (op[0] === 'swap') { const [, a, ai, b, bi] = op; const tmp = trip.days[a][ai]; trip.days[a][ai] = trip.days[b][bi]; trip.days[b][bi] = tmp; }
+      else { const [, a, ai, ref] = op; trip.days[a][ai] = { ref, at: item(ref).kind === 'leisure' ? '10:00' : trip.days[a][ai].at, mode: 'solo' }; }
+      break;
+    }
+  }
+  save(); render();
+  const s2 = document.querySelector('.scroll'); if (s2) s2.scrollTop = resetScroll ? 0 : keep;
+});
+document.addEventListener('change', ev => {
+  if (ev.target.id === 'start' && ev.target.value) ui.startInput = ev.target.value;
+  if (ev.target.id === 'bk-size' && ui.form) ui.form.size = ev.target.value;
+});
+document.addEventListener('input', ev => { if (ev.target.id === 'bk-note' && ui.form) ui.form.note = ev.target.value; });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && ui.sheet) { ui.sheet = null; render(); } });
+render();
+</script>
+
+</body></html>
